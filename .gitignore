@@ -43,3 +43,7 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# live E2E scratch script — contains a real password, never commit
+/e2e-live.mjs
+/e2e-live.*.mjs

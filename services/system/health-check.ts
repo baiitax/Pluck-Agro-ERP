@@ -23,8 +23,15 @@ export async function getSystemHealth(): Promise<HealthStatus> {
 
   if (envOk) {
     try {
-      const { createSupabaseServerClient } = await import("@/lib/supabase/server");
-      const supabase = await createSupabaseServerClient();
+      // The probe uses the privileged server client on purpose.
+      //
+      // It used to run with the anon key and no session, and the migrations grant `anon` nothing — so PostgREST
+      // answered "permission denied for table departments" (42501) and this endpoint reported the database as
+      // unhealthy while it was perfectly fine. That is the worst kind of alarm: permanently red, so people learn
+      // to ignore it. A reachability probe should test reachability, not row access, so it asks with the key the
+      // server already uses elsewhere and reads nothing but a boolean.
+      const { createSupabaseAdminClient } = await import("@/lib/supabase/admin");
+      const supabase = createSupabaseAdminClient();
       const { error } = await supabase.from("departments").select("id", { head: true, count: "exact" }).limit(1);
       database = error ? "error" : "ok";
     } catch {
