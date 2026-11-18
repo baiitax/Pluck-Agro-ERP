@@ -3,7 +3,7 @@ export const APP_CONFIG = {
   shortName: "Pluck ERP",
   organisation: "Pluck Agro Allied",
   version: "0.1.0",
-  phase: "Phase 0 — Technical Foundation",
+  phase: "Phase 5 — Quality Management",
   description:
     "Integrated enterprise resource planning platform for Pluck Agro Allied procurement, production, inventory, sales, export and finance operations.",
   supportEmail: "support@pluckagro.example",

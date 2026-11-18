@@ -6,7 +6,7 @@
 --
 -- Codes follow module.resource.action. They are controlled system data: administrators may
 -- change role → permission grants, but cannot invent new permission codes at runtime.
--- This file deliberately excludes master_data.* codes (seeded by 0040), procurement.* codes (seeded by 0051) and inventory/production codes (seeded by 0065).
+-- This file deliberately excludes master_data.* codes (seeded by 0040), procurement.* codes (seeded by 0051), inventory/production codes (seeded by 0065) and quality codes (seeded by 0082).
 
 insert into public.permissions (module, resource, action, code, description)
 values
@@ -51,8 +51,6 @@ values
   ('governance', 'reviews', 'manage', 'governance.reviews.manage', 'Record and complete access reviews'),
   ('settings', 'system', 'view', 'settings.system.view', 'View system configuration'),
   ('settings', 'system', 'manage', 'settings.system.manage', 'Manage system configuration'),
-  ('quality', 'inspection', 'view', 'quality.inspection.view', 'View quality inspections'),
-  ('quality', 'inspection', 'manage', 'quality.inspection.manage', 'Record inspections, releases and quarantines'),
   ('sales', 'order', 'view', 'sales.order.view', 'View sales orders'),
   ('sales', 'order', 'create', 'sales.order.create', 'Create sales orders'),
   ('sales', 'order', 'approve', 'sales.order.approve', 'Approve sales orders'),
@@ -83,7 +81,7 @@ on conflict (code) do update
 -- Remove rows in THIS slice that are no longer catalogued (keeps seeds deterministic).
 -- The slice predicate is what stops each seed from deleting the other phase's codes.
 delete from public.permissions p
- where (p.code not like 'master_data.%' and p.code not like 'procurement.%' and p.code not like 'inventory.%' and p.code not like 'production.%')
+ where (p.code not like 'master_data.%' and p.code not like 'procurement.%' and p.code not like 'inventory.%' and p.code not like 'production.%' and p.code not like 'quality.%')
    and p.code <> all (array[
    'dashboard.overview.view',
    'employees.employee.view',
@@ -126,8 +124,6 @@ delete from public.permissions p
    'governance.reviews.manage',
    'settings.system.view',
    'settings.system.manage',
-   'quality.inspection.view',
-   'quality.inspection.manage',
    'sales.order.view',
    'sales.order.create',
    'sales.order.approve',

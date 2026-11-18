@@ -46,7 +46,7 @@ export default async function DashboardPage() {
     <div>
       <PageHeader
         title={`Welcome, ${displayName}`}
-        description="This is the Phase 0 foundation: secure sign-in, role-based access, employee administration and audit history. Operational and financial dashboards appear once those modules are implemented with verified data."
+        description="Delivered so far: identity and governance, master data, procurement, inventory and production, and quality management. Sales, export, treasury and financial dashboards appear once those modules are implemented with verified data."
         breadcrumbs={[{ label: "Dashboard" }]}
         badge={
           <Badge tone="brand" dot>

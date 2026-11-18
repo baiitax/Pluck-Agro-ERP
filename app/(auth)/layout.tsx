@@ -35,8 +35,9 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             One operating system for procurement, production, inventory, sales, export and finance.
           </h2>
           <p className="mt-3 max-w-sm text-sm text-brand-100/85">
-            {APP_CONFIG.phase}. This release delivers the secure identity, authorization and
-            administrative foundation. Operational modules follow in later phases.
+            {APP_CONFIG.phase}. The platform is delivered in phases, and each business area becomes
+            available to authorised staff once it is implemented and verified. Areas still in progress
+            are shown to nobody.
           </p>
 
           <ul className="mt-8 space-y-3 text-sm text-brand-100/90">

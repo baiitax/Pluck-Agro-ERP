@@ -86,7 +86,7 @@ export default async function AdministrationPage() {
         <CardHeader>
           <div>
             <CardTitle>What this foundation enforces</CardTitle>
-            <CardDescription>Phase 0 security model</CardDescription>
+            <CardDescription>Security model</CardDescription>
           </div>
         </CardHeader>
         <CardContent className="grid gap-2 text-xs text-ink-muted sm:grid-cols-2">

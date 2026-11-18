@@ -1,3 +1,4 @@
+/* eslint-disable no-console -- a CLI smoke test reports through stdout. */
 import { chromium } from "playwright";
 
 

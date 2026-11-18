@@ -48,9 +48,9 @@ export function ModulePlaceholder({
             <div>
               <h2 className="text-sm font-semibold text-ink">This module arrives in {plannedPhase}</h2>
               <p className="mt-1 max-w-2xl text-sm text-ink-muted">
-                Phase 0 delivers the secure foundation — authentication, role-based access, audit history and
-                the administration console. Business workflows are built on that foundation in later phases so
-                that financial and inventory postings are transactional and auditable from day one.
+                Delivered so far: identity and governance, master data, procurement, inventory and production,
+                and quality management. Business workflows are built on that foundation so that financial and
+                inventory postings are transactional and auditable from day one.
               </p>
               <p className="mt-3 text-xs font-medium text-ink-subtle">Required permission: {permission}</p>
             </div>

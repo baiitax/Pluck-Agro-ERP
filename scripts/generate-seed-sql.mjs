@@ -63,15 +63,19 @@ const isProcurement = (code) => code.startsWith("procurement.");
 // Phase 4 codes cannot be inserted until 0058 widens the closed action vocabulary, so they are seeded
 // later than the Phase 0/1 slice and are excluded from it for the same reason as the others.
 const isInventory = (code) => code.startsWith("inventory.") || code.startsWith("production.");
+// Phase 5 codes arrive with the widened quality vocabulary (collect, record, hold) and are seeded by 0082/0083.
+const isQuality = (code) => code.startsWith("quality.");
 const masterDataCodes = ALL_PERMISSION_CODES.filter(isMasterData);
 const procurementCodes = ALL_PERMISSION_CODES.filter(isProcurement);
 const inventoryCodes = ALL_PERMISSION_CODES.filter(isInventory);
+const qualityCodes = ALL_PERMISSION_CODES.filter(isQuality);
 const phase1Codes = ALL_PERMISSION_CODES.filter(
-  (code) => !isMasterData(code) && !isProcurement(code) && !isInventory(code),
+  (code) => !isMasterData(code) && !isProcurement(code) && !isInventory(code) && !isQuality(code),
 );
 
 if (
   phase1Codes.length === 0 ||
+  qualityCodes.length === 0 ||
   masterDataCodes.length === 0 ||
   procurementCodes.length === 0 ||
   inventoryCodes.length === 0
@@ -236,9 +240,9 @@ writeFileSync(
     codes: phase1Codes,
     header: "0025 — seed the Phase 0/1 permission catalogue",
     scopeNote:
-      "This file deliberately excludes master_data.* codes (seeded by 0040), procurement.* codes (seeded by 0051) and inventory/production codes (seeded by 0065).",
+      "This file deliberately excludes master_data.* codes (seeded by 0040), procurement.* codes (seeded by 0051), inventory/production codes (seeded by 0065) and quality codes (seeded by 0082).",
     slicePredicate:
-      "p.code not like 'master_data.%' and p.code not like 'procurement.%' and p.code not like 'inventory.%' and p.code not like 'production.%'",
+      "p.code not like 'master_data.%' and p.code not like 'procurement.%' and p.code not like 'inventory.%' and p.code not like 'production.%' and p.code not like 'quality.%'",
   }),
 );
 writeFileSync(join(migrationsDir, "0026_seed_phase_1_roles.sql"), rolesSql);
@@ -315,6 +319,27 @@ writeFileSync(
   }),
 );
 
+writeFileSync(
+  join(migrationsDir, "0082_seed_quality_permissions.sql"),
+  permissionsSql({
+    codes: qualityCodes,
+    header: "0082 — seed the Phase 5 quality permission catalogue",
+    scopeNote:
+      "Runs after 0074, which widened the permitted action vocabulary (collect, record, hold).",
+    slicePredicate: "p.code like 'quality.%'",
+  }),
+);
+writeFileSync(
+  join(migrationsDir, "0083_seed_quality_grants.sql"),
+  grantsSql({
+    codes: qualityCodes,
+    header: "0083 — seed Phase 5 quality role → permission grants",
+    functionBlock: "-- private.seed_role_permissions() is defined by 0027 and reused here.",
+    scopeNote:
+      "These are suggested mappings for management review. They deliberately separate recording a disposition from releasing stock and from approving a specification, so a single officer can inspect and decide while a second person authorises release; the setting inspection.allow_self_approval is the documented way to relax that where the site has one qualified officer.",
+  }),
+);
+
 const grantCount = (codes) => {
   const codeSet = new Set(codes);
   return SYSTEM_ROLE_CODES.reduce(
@@ -329,5 +354,6 @@ console.info(
     `${SYSTEM_ROLE_CODES.length} roles in 0026, ` +
     `${grantCount(phase1Codes)} Phase 0/1 grants in 0027, ${grantCount(masterDataCodes)} master data grants in 0041, ` +
     `${procurementCodes.length} procurement codes and ${grantCount(procurementCodes)} procurement grants in 0051/0052, ` +
-    `${inventoryCodes.length} inventory/production codes and ${grantCount(inventoryCodes)} grants in 0065/0066.`,
+    `${inventoryCodes.length} inventory/production codes and ${grantCount(inventoryCodes)} grants in 0065/0066, ` +
+    `${qualityCodes.length} quality codes and ${grantCount(qualityCodes)} grants in 0082/0083.`,
 );

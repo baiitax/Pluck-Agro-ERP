@@ -4,11 +4,14 @@ import * as React from "react";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 
 import { BrandMark } from "@/components/layout/brand-mark";
+import { APP_CONFIG } from "@/config/app.config";
 import { SidebarNav } from "@/components/layout/sidebar-nav";
 import type { NavGroup } from "@/config/navigation.config";
 
 export function AppSidebar({ groups, version }: { groups: NavGroup[]; version: string }) {
   const [collapsed, setCollapsed] = React.useState(false);
+  // Only the phase number fits the footer; the full label lives in APP_CONFIG so it cannot drift here.
+  const phase = APP_CONFIG.phase.split(" — ")[0];
 
   return (
     <aside
@@ -33,7 +36,7 @@ export function AppSidebar({ groups, version }: { groups: NavGroup[]; version: s
 
       <div className="border-t border-border px-3 py-2">
         {!collapsed ? (
-          <p className="text-[0.6875rem] text-ink-subtle">v{version} · Phase 0 foundation</p>
+          <p className="text-[0.6875rem] text-ink-subtle">v{version} · {phase}</p>
         ) : (
           <p className="text-center text-[0.625rem] text-ink-subtle">v{version}</p>
         )}

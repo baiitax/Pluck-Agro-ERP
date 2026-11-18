@@ -47,10 +47,11 @@ describe("permission catalogue", () => {
   it("uses only declared actions", () => {
     const used = new Set(ALL_PERMISSION_CODES.map((code) => PERMISSION_CATALOG[code]!.action));
     for (const action of used) expect(PERMISSION_ACTIONS).toContain(action);
-    // The vocabulary is closed and versioned: 20 Phase 1 verbs, the 5 master-data verbs added by
-    // Phase 2, and the 7 procurement document verbs added by Phase 3 (issue, amend, compare,
-    // select, close, upload, reconcile). Declaring a verb before it is used keeps codes stable.
-    expect(PERMISSION_ACTIONS).toHaveLength(38);
+    // The vocabulary is closed and versioned: the Phase 1 verbs, the master-data verbs added by Phase 2,
+    // the procurement document verbs added by Phase 3, the inventory verbs added by Phase 4 and the three
+    // quality verbs added by Phase 5 (collect, record, hold). Declaring a verb before it is used keeps the
+    // codes stable, and the length check is what makes an accidental new verb a deliberate act.
+    expect(PERMISSION_ACTIONS).toHaveLength(41);
   });
 
   it("declares the seven scopes with GLOBAL first", () => {
@@ -163,11 +164,12 @@ describe("seed migration parity", () => {
     return new Set<string>(codes);
   };
 
-  it("seeds every catalogued permission code, split across the four phase seeds", () => {
+  it("seeds every catalogued permission code, split across the five phase seeds", () => {
     const phase1 = seedCodes("0025_seed_phase_1_permissions.sql");
     const masterData = seedCodes("0040_seed_master_data_permissions.sql");
     const procurement = seedCodes("0051_seed_procurement_permissions.sql");
     const inventory = seedCodes("0065_seed_inventory_permissions.sql");
+    const quality = seedCodes("0082_seed_quality_permissions.sql");
 
     // The split is by module, and it exists because 0030, 0042 and 0058 widen the action vocabulary
     // after 0025 has already run. No file may contain another slice's codes.
@@ -176,14 +178,16 @@ describe("seed migration parity", () => {
       expect(code.startsWith("procurement."), code).toBe(false);
       expect(code.startsWith("inventory."), code).toBe(false);
       expect(code.startsWith("production."), code).toBe(false);
+      expect(code.startsWith("quality."), code).toBe(false);
     }
+    for (const code of Array.from(quality)) expect(code.startsWith("quality."), code).toBe(true);
     for (const code of Array.from(masterData)) expect(code.startsWith("master_data."), code).toBe(true);
     for (const code of Array.from(procurement)) expect(code.startsWith("procurement."), code).toBe(true);
     for (const code of Array.from(inventory)) {
       expect(code.startsWith("inventory.") || code.startsWith("production."), code).toBe(true);
     }
 
-    const seeded = new Set([...phase1, ...masterData, ...procurement, ...inventory]);
+    const seeded = new Set([...phase1, ...masterData, ...procurement, ...inventory, ...quality]);
     expect(seeded.size).toBe(ALL_PERMISSION_CODES.length);
     for (const code of ALL_PERMISSION_CODES) expect(seeded.has(code), code).toBe(true);
   });
@@ -197,6 +201,8 @@ describe("seed migration parity", () => {
     expect(read("0040_seed_master_data_permissions.sql")).toContain("p.code like 'master_data.%'");
     expect(read("0051_seed_procurement_permissions.sql")).toContain("p.code like 'procurement.%'");
     expect(read("0065_seed_inventory_permissions.sql")).toContain("p.code like 'inventory.%'");
+    expect(phase1).toContain("p.code not like 'quality.%'");
+    expect(read("0082_seed_quality_permissions.sql")).toContain("p.code like 'quality.%'");
   });
 
   it("seeds exactly the roster of system roles into 0026", () => {
@@ -211,6 +217,7 @@ describe("seed migration parity", () => {
       "0041_seed_master_data_grants.sql",
       "0052_seed_procurement_grants.sql",
       "0066_seed_inventory_grants.sql",
+      "0083_seed_quality_grants.sql",
     ]
       .map((file) => read(file))
       .join("\n");
@@ -238,6 +245,7 @@ describe("seed migration parity", () => {
       "0041_seed_master_data_grants.sql",
       "0052_seed_procurement_grants.sql",
       "0066_seed_inventory_grants.sql",
+      "0083_seed_quality_grants.sql",
     ]) {
       expect(read(file)).toContain("delete from public.role_permissions rp");
     }
@@ -289,7 +297,9 @@ describe("navigation configuration", () => {
     ]) {
       expect(ready, href).toContain(href);
     }
-    expect(ready).not.toContain("/procurement");
+    // The guard exists so a module that has not shipped is never advertised as ready. It names export, which is
+    // genuinely still a placeholder; procurement, inventory, production and quality have all shipped since.
+    expect(ready).not.toContain("/export");
   });
 
   it("carries a note for every planned module so the UI can be honest about status", () => {
