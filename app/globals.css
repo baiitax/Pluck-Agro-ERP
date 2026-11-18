@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------
+   Pluck Agro ERP design tokens
+   Semantic tokens first, raw palette second. Components must use the
+   semantic utilities (bg-surface, text-ink, border-border, ...) so a
+   future dark theme only needs to re-declare these variables.
+   ------------------------------------------------------------------ */
+
+@theme {
+  --color-brand-50: #eef7f1;
+  --color-brand-100: #d6ecdd;
+  --color-brand-200: #aedbbd;
+  --color-brand-300: #7cc296;
+  --color-brand-400: #4ba571;
+  --color-brand-500: #2c8a58;
+  --color-brand-600: #1f6f47;
+  --color-brand-700: #1a583a;
+  --color-brand-800: #164630;
+  --color-brand-900: #113828;
+  --color-brand-950: #0a2318;
+
+  --color-surface: #ffffff;
+  --color-surface-muted: #f6f7f5;
+  --color-surface-sunken: #eef0ec;
+  --color-border: #dfe3dc;
+  --color-border-strong: #c6cdc3;
+
+  --color-ink: #16211b;
+  --color-ink-muted: #5a655e;
+  --color-ink-subtle: #7c857f;
+
+  --color-success-50: #ecfdf3;
+  --color-success-600: #12864b;
+  --color-success-700: #0f6b3c;
+  --color-pending-50: #fff8e6;
+  --color-pending-600: #a86b00;
+  --color-pending-700: #8a5800;
+  --color-warning-50: #fff4e5;
+  --color-warning-600: #b45309;
+  --color-danger-50: #fef2f2;
+  --color-danger-600: #c0342b;
+  --color-danger-700: #9c2820;
+  --color-info-50: #eff6ff;
+  --color-info-600: #1d4ed8;
+  --color-neutral-50: #f4f5f4;
+  --color-neutral-600: #525b55;
+
+  --radius-card: 0.75rem;
+  --shadow-card: 0 1px 2px 0 rgb(16 24 20 / 0.04), 0 1px 3px 0 rgb(16 24 20 / 0.06);
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-surface-muted);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand-600);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--color-brand-100);
+    color: var(--color-brand-900);
+  }
+}
+
+@layer components {
+  .erp-card {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+  }
+
+  .erp-table-head {
+    background-color: var(--color-surface-muted);
+    color: var(--color-ink-muted);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+}
+
+/* Respect reduced-motion preferences across the app shell. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

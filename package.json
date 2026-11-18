@@ -1,0 +1,58 @@
+{
+  "name": "pluck-agro-erp",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Pluck Agro ERP — Phase 0 technical foundation",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest --project unit",
+    "test:db": "vitest run --project database",
+    "test:all": "vitest run",
+    "test:e2e": "playwright test",
+    "db:verify": "vitest run --project database",
+    "db:types": "node scripts/generate-db-types.mjs",
+    "admin:bootstrap": "node --experimental-strip-types scripts/bootstrap-admin.ts",
+    "test:unit": "vitest run --project unit",
+    "test:database": "vitest run --project database"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.2.2",
+    "@supabase/ssr": "0.9.0",
+    "@supabase/supabase-js": "2.99.0",
+    "@tanstack/react-table": "^8.21.3",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.548.0",
+    "next": "16.4.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-hook-form": "^7.65.0",
+    "recharts": "^3.2.1",
+    "server-only": "^0.0.1",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.3.1",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.16",
+    "@playwright/test": "^1.56.0",
+    "@tailwindcss/postcss": "^4.3.5",
+    "@types/node": "^20.19.22",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "eslint": "^9.39.0",
+    "eslint-config-next": "16.4.6",
+    "tailwindcss": "^4.3.5",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.12"
+  }
+}

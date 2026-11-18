@@ -1,0 +1,120 @@
+-- 0051 — seed the Phase 3 procurement permission catalogue
+--
+-- GENERATED FILE — do not edit by hand.
+-- Source: lib/permissions/definitions.ts
+-- Regenerate: node scripts/generate-seed-sql.mjs
+--
+-- Codes follow module.resource.action. They are controlled system data: administrators may
+-- change role → permission grants, but cannot invent new permission codes at runtime.
+-- Runs after 0042, which widened the permitted action vocabulary (issue, amend, compare, select, close, upload, reconcile).
+
+insert into public.permissions (module, resource, action, code, description)
+values
+  ('procurement', 'dashboard', 'view', 'procurement.dashboard.view', 'View the procurement overview'),
+  ('procurement', 'requisition', 'view', 'procurement.requisition.view', 'View purchase requisitions'),
+  ('procurement', 'requisition', 'create', 'procurement.requisition.create', 'Raise purchase requisitions'),
+  ('procurement', 'requisition', 'update', 'procurement.requisition.update', 'Edit own draft requisitions'),
+  ('procurement', 'requisition', 'submit', 'procurement.requisition.submit', 'Submit a requisition for approval'),
+  ('procurement', 'requisition', 'approve', 'procurement.requisition.approve', 'Review and approve requisitions'),
+  ('procurement', 'requisition', 'reject', 'procurement.requisition.reject', 'Reject requisitions with a reason'),
+  ('procurement', 'requisition', 'cancel', 'procurement.requisition.cancel', 'Cancel requisitions'),
+  ('procurement', 'requisition', 'manage', 'procurement.requisition.manage', 'Work requisitions across all departments'),
+  ('procurement', 'quotation', 'view', 'procurement.quotation.view', 'View supplier quotations'),
+  ('procurement', 'quotation', 'create', 'procurement.quotation.create', 'Record supplier quotations and requests'),
+  ('procurement', 'quotation', 'update', 'procurement.quotation.update', 'Edit recorded quotations'),
+  ('procurement', 'quotation', 'compare', 'procurement.quotation.compare', 'Build and review quotation comparisons'),
+  ('procurement', 'quotation', 'select', 'procurement.quotation.select', 'Record the supplier selection decision'),
+  ('procurement', 'purchase_order', 'view', 'procurement.purchase_order.view', 'View purchase requests and orders'),
+  ('procurement', 'purchase_order', 'create', 'procurement.purchase_order.create', 'Create purchase requests and orders'),
+  ('procurement', 'purchase_order', 'update', 'procurement.purchase_order.update', 'Edit draft purchase orders'),
+  ('procurement', 'purchase_order', 'submit', 'procurement.purchase_order.submit', 'Submit a purchase order for approval'),
+  ('procurement', 'purchase_order', 'approve', 'procurement.purchase_order.approve', 'Approve purchase orders'),
+  ('procurement', 'purchase_order', 'issue', 'procurement.purchase_order.issue', 'Issue an approved purchase order to the supplier'),
+  ('procurement', 'purchase_order', 'amend', 'procurement.purchase_order.amend', 'Raise and apply purchase order amendments'),
+  ('procurement', 'purchase_order', 'cancel', 'procurement.purchase_order.cancel', 'Cancel purchase orders'),
+  ('procurement', 'purchase_order', 'close', 'procurement.purchase_order.close', 'Close purchase orders with quantities outstanding'),
+  ('procurement', 'purchase_order', 'export', 'procurement.purchase_order.export', 'Export the purchase order register'),
+  ('procurement', 'goods_receipt', 'view', 'procurement.goods_receipt.view', 'View goods receipts'),
+  ('procurement', 'goods_receipt', 'create', 'procurement.goods_receipt.create', 'Record goods receipts'),
+  ('procurement', 'goods_receipt', 'update', 'procurement.goods_receipt.update', 'Edit draft goods receipts'),
+  ('procurement', 'goods_receipt', 'submit', 'procurement.goods_receipt.submit', 'Submit a goods receipt for review'),
+  ('procurement', 'goods_receipt', 'review', 'procurement.goods_receipt.review', 'Review goods receipts and inspect deliveries'),
+  ('procurement', 'goods_receipt', 'approve', 'procurement.goods_receipt.approve', 'Approve goods receipts'),
+  ('procurement', 'goods_receipt', 'post', 'procurement.goods_receipt.post', 'Post an approved goods receipt'),
+  ('procurement', 'goods_receipt', 'cancel', 'procurement.goods_receipt.cancel', 'Cancel goods receipts'),
+  ('procurement', 'supplier_advance', 'view', 'procurement.supplier_advance.view', 'View supplier advances'),
+  ('procurement', 'supplier_advance', 'create', 'procurement.supplier_advance.create', 'Record supplier advances'),
+  ('procurement', 'supplier_advance', 'submit', 'procurement.supplier_advance.submit', 'Submit a supplier advance for approval'),
+  ('procurement', 'supplier_advance', 'approve', 'procurement.supplier_advance.approve', 'Approve supplier advances and confirm payment'),
+  ('procurement', 'supplier_advance', 'cancel', 'procurement.supplier_advance.cancel', 'Cancel supplier advances'),
+  ('procurement', 'supplier_advance_payment', 'view', 'procurement.supplier_advance_payment.view', 'View supplier advance payment details'),
+  ('procurement', 'supplier_advance_payment', 'manage', 'procurement.supplier_advance_payment.manage', 'Record supplier advance payment details'),
+  ('procurement', 'reconciliation', 'view', 'procurement.reconciliation.view', 'View supplier statements and reconciliation'),
+  ('procurement', 'reconciliation', 'manage', 'procurement.reconciliation.manage', 'Prepare and review supplier reconciliations'),
+  ('procurement', 'reports', 'view', 'procurement.reports.view', 'View procurement reports'),
+  ('procurement', 'reports', 'export', 'procurement.reports.export', 'Export procurement reports'),
+  ('procurement', 'document', 'view', 'procurement.document.view', 'View procurement documents'),
+  ('procurement', 'document', 'upload', 'procurement.document.upload', 'Attach procurement documents'),
+  ('procurement', 'approval', 'view', 'procurement.approval.view', 'View the procurement approval trail'),
+  ('procurement', 'legacy', 'view', 'procurement.legacy.view', 'View legacy procurement mapping readiness'),
+  ('procurement', 'legacy', 'manage', 'procurement.legacy.manage', 'Maintain legacy procurement mapping records')
+on conflict (code) do update
+  set module = excluded.module,
+      resource = excluded.resource,
+      action = excluded.action,
+      description = excluded.description;
+
+-- Remove rows in THIS slice that are no longer catalogued (keeps seeds deterministic).
+-- The slice predicate is what stops each seed from deleting the other phase's codes.
+delete from public.permissions p
+ where (p.code like 'procurement.%')
+   and p.code <> all (array[
+   'procurement.dashboard.view',
+   'procurement.requisition.view',
+   'procurement.requisition.create',
+   'procurement.requisition.update',
+   'procurement.requisition.submit',
+   'procurement.requisition.approve',
+   'procurement.requisition.reject',
+   'procurement.requisition.cancel',
+   'procurement.requisition.manage',
+   'procurement.quotation.view',
+   'procurement.quotation.create',
+   'procurement.quotation.update',
+   'procurement.quotation.compare',
+   'procurement.quotation.select',
+   'procurement.purchase_order.view',
+   'procurement.purchase_order.create',
+   'procurement.purchase_order.update',
+   'procurement.purchase_order.submit',
+   'procurement.purchase_order.approve',
+   'procurement.purchase_order.issue',
+   'procurement.purchase_order.amend',
+   'procurement.purchase_order.cancel',
+   'procurement.purchase_order.close',
+   'procurement.purchase_order.export',
+   'procurement.goods_receipt.view',
+   'procurement.goods_receipt.create',
+   'procurement.goods_receipt.update',
+   'procurement.goods_receipt.submit',
+   'procurement.goods_receipt.review',
+   'procurement.goods_receipt.approve',
+   'procurement.goods_receipt.post',
+   'procurement.goods_receipt.cancel',
+   'procurement.supplier_advance.view',
+   'procurement.supplier_advance.create',
+   'procurement.supplier_advance.submit',
+   'procurement.supplier_advance.approve',
+   'procurement.supplier_advance.cancel',
+   'procurement.supplier_advance_payment.view',
+   'procurement.supplier_advance_payment.manage',
+   'procurement.reconciliation.view',
+   'procurement.reconciliation.manage',
+   'procurement.reports.view',
+   'procurement.reports.export',
+   'procurement.document.view',
+   'procurement.document.upload',
+   'procurement.approval.view',
+   'procurement.legacy.view',
+   'procurement.legacy.manage'
+ ]::text[]);
