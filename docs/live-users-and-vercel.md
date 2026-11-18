@@ -5,6 +5,50 @@
 
 ---
 
+## 0. Outcome — this is finished
+
+The live site **signs real users in** against the live database. Nothing is stubbed and nothing is a placeholder.
+
+| Check | Result |
+| --- | --- |
+| `https://pluckagro.vercel.app/api/health` | **200** `{"status":"ok","checks":{"database":"ok","environment":"ok"}}` |
+| Anonymous `/inventory` | 307 → `/login?next=%2Finventory` |
+| Sign-in as `management@pluckagro.com` | → `/dashboard`, signed-in user shown |
+| `/inventory`, `/production`, `/master-data/products` | render real workspace content, no permission guard |
+| Browser console / network during the run | no failed requests |
+
+Production is deployed from `main` (`429c025`) on Vercel project `pluckagro`:
+
+- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`,
+  `SUPABASE_SECRET_KEY`, `SUPABASE_JWT_SECRET` were already present (17 env vars total);
+  `NEXT_PUBLIC_APP_URL=https://pluckagro.vercel.app` was added.
+- Supabase `auth.users` rows created by migration had to be completed before GoTrue would issue a token.
+  NULL token columns (`confirmation_token`, `recovery_token`, `email_change`, `email_change_token_new`,
+  `email_change_token_current`, `reauthentication_token`, `email_change_confirm_status`) made every password
+  grant fail with `500 unexpected_failure`; `instance_id` had to be set as well. `confirmed_at` is a **generated
+  column** and must never appear in an `UPDATE`.
+
+### The health endpoint that always lied
+
+`/api/health` reported `database: "error"` while the database was healthy. The probe read `departments` with the
+**anon** key and no session, and the migrations grant `anon` nothing — by design — so PostgREST answered
+`42501 permission denied`. A monitor that is permanently red is a monitor nobody reads. The probe now uses the
+server-only admin client and fails only on a real error (`services/system/health-check.ts`, commit `429c025`).
+
+### Security follow-up — read this before adding anything to the repo
+
+A scratch Playwright script containing a real account password was committed once to the public repo
+(`579e976`). It was removed, the commit was rewritten, and `main` force-pushed to `429c025`; `.gitignore` now
+excludes `e2e-live*.mjs`. **The old commit is still fetchable on GitHub by its SHA**, so the password must be
+treated as exposed:
+
+- rotate the `management@pluckagro.com` password;
+- rotate every secret that has been pasted in chat: the working Vercel token, the GitHub PAT, the database
+  password, and both ERP user passwords.
+
+Rule going forward: **no credential ever enters a tracked file.** Live E2E scripts live outside the repo or read
+credentials from the environment.
+
 ## 1. Users created — DONE
 
 Two accounts were created directly in the live database, in one transaction, and verified.
